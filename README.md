@@ -1,2 +1,2 @@
 # Esper-Keyboard
-Custom Made Mechanical 40 Percent Keyboard. Codename "Esper"
+Custom made mechanical 40 percent keyboard. Codename "Esper"
