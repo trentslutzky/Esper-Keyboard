@@ -1,5 +1,3 @@
-
-
 import serial
 import time
 
@@ -84,7 +82,7 @@ def waitForArduino():
     # the program
 
 
-setupSerial(115200, "COM4")
+setupSerial(115200, "/dev/ttyACM0")
 
 while True:
     print('\n')
