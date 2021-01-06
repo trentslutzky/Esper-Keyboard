@@ -1,15 +1,5 @@
-/* Buttons to USB Keyboard Example - Special Media Player Keys
-
-   You must select Keyboard from the "Tools > USB Type" menu
-
-   This example code is in the public domain.
-*/
-
 #include <Bounce.h>
 
-// Create Bounce objects for each button.  The Bounce object
-// automatically deals with contact chatter or "bounce", and
-// it makes detecting changes very simple.
 Bounce button0 = Bounce(0, 10);
 Bounce button1 = Bounce(1, 10);  // 10 ms debounce time is appropriate
 Bounce button2 = Bounce(2, 10);  // for most mechanical pushbuttons
@@ -23,13 +13,9 @@ boolean newData = false;
 
 byte ledPin = 13;   // the onboard LE
 
+String data_string = "";
+
 void setup() {
-  // Configure the pins for input mode with pullup resistors.
-  // The pushbuttons connect from each pin to ground.  When
-  // the button is pressed, the pin reads LOW because the button
-  // shorts it to ground.  When released, the pin reads HIGH
-  // because the pullup resistor connects to +5 volts inside
-  // the chip.
   pinMode(0, INPUT_PULLUP);
   pinMode(1, INPUT_PULLUP);
   pinMode(2, INPUT_PULLUP);
@@ -64,19 +50,24 @@ void loop() {
   recvWithStartEndMarkers();
 
   if (newData == true) {
-    String test_string(receivedChars);
-    if (test_string == "Volume:60") {
-      digitalWrite(ledPin, HIGH);
+    String input_string(receivedChars);
+    data_string = input_string;
+    data_string.remove(0,1);
+    Serial.println(input_string);
+    if(input_string.startsWith("V")){
+      int volume = data_string.toInt();
+      if (volume > 30) {
+        digitalWrite(ledPin, HIGH);
+      }
+      else {
+        digitalWrite(ledPin, LOW);
+      }
     }
-    else {
-      digitalWrite(ledPin, LOW);
-    }
+
     newData = false;
   }
 
-  // Update all the buttons.  There should not be any long
-  // delays in loop(), so this runs repetitively at a rate
-  // faster than the buttons could be pressed and released.
+  // Update all the buttons.
   button0.update();
   button1.update();
   button2.update();

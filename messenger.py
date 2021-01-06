@@ -2,6 +2,9 @@
 
 import os, serial, time, platform
 from datetime import datetime
+from ahk import AHK
+
+ahk = AHK()
 
 print('Launching Esper Messenger!')
 time.sleep(1)
@@ -10,9 +13,14 @@ sys_type = platform.system()
 print(sys_type)
 
 # get the serial port of the teensy usb 
-stream = os.popen('arduino-cli board list | grep USB')
-output = stream.read()[:12]
-serialPortName = output
+# linux
+if(sys_type == 'Linux'):
+    stream = os.popen('arduino-cli board list | grep USB')
+    output = stream.read()[:12]
+    serialPortName = output
+
+elif(sys_type == 'Windows'):
+   serialPortName = 'COM4' 
 
 print('Teensy found at port:',serialPortName)
 
@@ -39,13 +47,19 @@ while True:
             last_time = current_time
 
     time.sleep(0.1)
-    stream = os.popen("amixer sget Master | grep 'Right:' | awk -F'[][]' '{ print $2 }'")
-    output = stream.read()
-    volume = int(output.replace('%','').replace('\n',''))
-    current_volume = volume
+    #linux volume getter
+    if(sys_type == 'Linux'):
+        stream = os.popen("amixer sget Master | grep 'Right:' | awk -F'[][]' '{ print $2 }'")
+        output = stream.read()
+        volume = int(output.replace('%','').replace('\n',''))
+    elif(sys_type):
+        volume = int(round(float(ahk.sound_get(device_number=1
+                        , component_type='MASTER'
+                        , control_type='VOLUME')),0))
 
+    current_volume = volume
     if(current_volume != last_volume):
-        volume_string = '<'+str(volume)+'>'
+        volume_string = '<V'+str(volume)+'>'
         print(volume_string)
         serialPort.write(volume_string.encode('utf-8'))
         last_volume = current_volume
